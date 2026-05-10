@@ -1,0 +1,107 @@
+---
+titulo: "Inicialización y Referencias — L-values vs R-values"
+descripcion: "Exploración de los tres tipos de inicialización en C++ moderno (Directa, Uniforme y Structured Binding), el uso de referencias para alias de variables, y la distinción fundamental entre L-values y R-values."
+lenguaje: "cpp"
+dificultad: 3
+etiquetas: ["inicializacion", "referencias", "lvalues", "rvalues", "structured-binding", "tuples"]
+fecha: 2024-03-01
+---
+
+## Objetivo
+
+Comprender los tres estilos de inicialización de C++ moderno y dominar el concepto de referencias para modificar variables indirectamente. También entender la distinción conceptual entre L-values y R-values.
+
+## Tipos de Inicialización
+
+### 1. Inicialización Directa (DI)
+
+La forma clásica, heredada de C:
+
+```cpp
+int    a   = 10;
+double b   = 10.5;
+bool   ok  = true;
+```
+
+### 2. Inicialización Uniforme (UI) — C++11
+
+Usa llaves `{}`. Es más estricta: no permite conversiones con pérdida de datos (*narrowing conversions*).
+
+```cpp
+int    d{20};
+double e{15.28};
+bool   f{false};
+```
+
+### 3. Structured Binding (SB) — C++17
+
+Desempaqueta tuplas, pares o structs en variables individuales de una sola línea:
+
+```cpp
+auto [nombre, edad, promedio, aprobado] = obtenerDatosEstudiante();
+```
+
+## Referencias
+
+Una referencia es un **alias** para una variable existente. Modificar la referencia modifica la variable original:
+
+```cpp
+int x = 42;
+int& refX = x; // refX es un alias de x
+refX = 100;    // ahora x == 100
+```
+
+## L-values vs R-values
+
+| Concepto | Descripción | Ejemplo |
+|----------|-------------|---------|
+| **L-value** | Tiene dirección de memoria, puede estar a la izquierda de `=` | `int x = 5;` → `x` es L-value |
+| **R-value** | Temporal, sin dirección persistente | `x + 1`, `42`, `"hola"` |
+| **L-value ref** | Referencia a un L-value | `int& ref = x;` |
+| **R-value ref** | Referencia a un R-value (C++11) | `int&& rref = 100;` |
+
+## Implementación Completa
+
+```cpp
+#include <iostream>
+#include <tuple>
+
+std::tuple<std::string, int, double, bool> getInfoEstudiante() {
+    return {"Ariel", 20, 9.5, true};
+}
+
+struct Point { int x, y, z; };
+
+int main() {
+    // --- Inicialización Directa ---
+    int a = 10; double b = 10.5; bool c = true;
+
+    // --- Inicialización Uniforme ---
+    int d{20}; double e{15.28}; bool f{false};
+
+    // --- Structured Binding ---
+    auto [nombre, edad, promedio, aprobado] = getInfoEstudiante();
+    std::cout << nombre << ", " << edad << " años\n";
+
+    // --- Referencias ---
+    int& A = a;   A = 78;    // a ahora es 78
+    double& B = b; B = 65.98; // b ahora es 65.98
+
+    // --- Structured Binding con struct ---
+    Point p = {5, 10, 15};
+    auto [x, y, z] = p;
+    std::cout << "x:" << x << " y:" << y << " z:" << z << "\n";
+
+    // --- L-values y R-values ---
+    int& lref  = a;       // L-value reference
+    int&& rref = 100;     // R-value reference
+
+    return 0;
+}
+```
+
+## Prueba el Código
+
+import LabRunner from '@components/labs/LabRunner.astro';
+
+<LabRunner language="cpp" rawCode={`#include <iostream>\n#include <tuple>\n\nstd::tuple<std::string,int,double,bool> getInfo() {\n    return {"Ariel", 20, 9.5, true};\n}\n\nstruct Point { int x, y, z; };\n\nint main() {\n    // Structured binding con tuple\n    auto [nombre, edad, prom, ok] = getInfo();\n    std::cout << nombre << " tiene " << edad << " años\\n";\n\n    // Structured binding con struct\n    Point p{5,10,15};\n    auto [x,y,z] = p;\n    std::cout << "x=" << x << " y=" << y << " z=" << z << "\\n";\n\n    // Referencias\n    int a = 42;\n    int& ref = a;\n    ref = 99;\n    std::cout << "a=" << a << "\\n"; // 99\n    return 0;\n}`} />

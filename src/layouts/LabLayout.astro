@@ -1,0 +1,150 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import LabRunner from "../components/labs/LabRunner.astro";
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  lenguaje: string;
+  dificultad: number;
+  etiquetas: string[];
+  fecha: Date;
+  godboltId?: string;
+  rawCode?: string;
+}
+
+const {
+  titulo,
+  descripcion,
+  lenguaje,
+  dificultad,
+  etiquetas,
+  fecha,
+  godboltId,
+  rawCode,
+} = Astro.props;
+
+const langColors: Record<string, string> = {
+  cpp: "#00ADB5",
+  python: "#3572A5",
+  rust: "#DEA584",
+  javascript: "#f7df1e",
+};
+const langLabels: Record<string, string> = {
+  cpp: "C++",
+  python: "Python",
+  rust: "Rust",
+  javascript: "JavaScript",
+};
+
+const color = langColors[lenguaje] ?? "#6c5ce7";
+const label = langLabels[lenguaje] ?? lenguaje;
+
+const diffStars = Array.from({ length: 5 }, (_, i) =>
+  i < dificultad ? "★" : "☆",
+).join("");
+
+const formattedDate = fecha.toLocaleDateString("es-ES", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<BaseLayout title={titulo} description={descripcion}>
+  <article class="max-w-4xl mx-auto px-6 py-12">
+    <!-- Breadcrumb -->
+    <nav class="text-sm mb-8" style="color: var(--color-text-secondary);">
+      <a href="/" class="hover:underline">Inicio</a>
+      <span class="mx-2">›</span>
+      <a href="/labs" class="hover:underline">Laboratorios</a>
+      <span class="mx-2">›</span>
+      <a href={`/labs/${lenguaje}`} class="hover:underline capitalize"
+        >{label}</a
+      >
+      <span class="mx-2">›</span>
+      <span style="color: var(--color-text-primary);">{titulo}</span>
+    </nav>
+
+    <!-- Header del Lab -->
+    <header class="mb-10">
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <span
+          class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+          style={`background-color: ${color}22; color: ${color}; border: 1px solid ${color}44;`}
+        >
+          {label}
+        </span>
+        <span
+          class="text-sm font-mono"
+          style="color: var(--color-accent);"
+          title={`Dificultad: ${dificultad}/5`}
+        >
+          {diffStars}
+        </span>
+        <span class="text-sm" style="color: var(--color-text-secondary);"
+          >{formattedDate}</span
+        >
+      </div>
+
+      <h1
+        class="text-3xl sm:text-4xl font-bold mb-4 leading-tight"
+        style="color: var(--color-text-primary);"
+      >
+        {titulo}
+      </h1>
+      <p
+        class="text-lg leading-relaxed"
+        style="color: var(--color-text-secondary);"
+      >
+        {descripcion}
+      </p>
+
+      <!-- Tags -->
+      <div class="flex flex-wrap gap-2 mt-5">
+        {
+          etiquetas.map((tag) => (
+            <span
+              class="px-2 py-1 rounded-md text-xs font-mono"
+              style="background-color: var(--color-accent-subtle); color: var(--color-accent);"
+            >
+              #{tag}
+            </span>
+          ))
+        }
+      </div>
+    </header>
+
+    <!-- Contenido MDX -->
+    <div
+      class="prose prose-invert max-w-none"
+      style="--tw-prose-body: var(--color-text-primary); --tw-prose-headings: var(--color-text-primary); --tw-prose-links: var(--color-accent);"
+    >
+      <slot />
+    </div>
+
+    <!-- Runner: Compiler Explorer iframe -->
+    {
+      (godboltId || rawCode) && (
+        <div class="mt-12">
+          <LabRunner
+            godboltId={godboltId}
+            rawCode={rawCode}
+            language={lenguaje}
+          />
+        </div>
+      )
+    }
+
+    <!-- Footer de navegación -->
+    <div class="mt-16 pt-8 border-t" style="border-color: var(--color-border);">
+      <a
+        href="/labs"
+        class="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:underline"
+        style="color: var(--color-accent);"
+      >
+        ← Volver a todos los laboratorios
+      </a>
+    </div>
+  </article>
+</BaseLayout>

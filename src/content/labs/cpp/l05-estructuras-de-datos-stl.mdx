@@ -1,0 +1,112 @@
+---
+titulo: "Estructuras de Datos STL — Sistema de Inventario"
+descripcion: "Aplicación práctica de los contenedores de la librería estándar de C++ (map, set, queue, stack, vector) construyendo un simulador de gestión de inventario, categorías, pedidos y carrito de compras."
+lenguaje: "cpp"
+dificultad: 3
+etiquetas: ["STL", "map", "set", "queue", "stack", "vector", "contenedores"]
+fecha: 2024-03-15
+---
+
+## Objetivo
+
+Aplicar los cinco contenedores más utilizados de la **Standard Template Library (STL)** de C++ en un contexto real: un sistema de gestión de tienda en línea.
+
+## Contenedores Utilizados
+
+| Contenedor | Estructura | Cuándo usarlo |
+|------------|-----------|---------------|
+| `std::map` | Árbol rojo-negro ordenado | Diccionarios clave → valor |
+| `std::set` | Árbol rojo-negro sin duplicados | Colecciones únicas |
+| `std::queue` | FIFO (primero en entrar, primero en salir) | Procesamiento de pedidos en orden |
+| `std::stack` | LIFO (último en entrar, primero en salir) | Lotes de reabastecimiento |
+| `std::vector` | Arreglo dinámico | Colecciones con acceso aleatorio |
+
+## Módulo 1: Inventario con `std::map`
+
+```cpp
+#include <map>
+#include <string>
+
+std::map<std::string, int> inventario;
+
+// Agregar producto (solo si no existe)
+inventario["Laptop"]   = 5;
+inventario["Mouse"]    = 20;
+inventario["Teclado"]  = 10;
+
+// Actualizar cantidad
+inventario["Laptop"] = 8;
+
+// Iterar
+for (const auto& [producto, cantidad] : inventario) {
+    std::cout << producto << ": " << cantidad << " unidades\n";
+}
+```
+
+## Módulo 2: Categorías con `std::set`
+
+```cpp
+#include <set>
+
+std::set<std::string> categorias;
+categorias.insert("Electrónica");
+categorias.insert("Accesorios");
+categorias.insert("Electrónica"); // ← ignorado, ya existe
+
+// Verificar existencia
+if (categorias.count("Periféricos") == 0) {
+    std::cout << "Categoría no encontrada\n";
+}
+```
+
+## Módulo 3: Pedidos con `std::queue` (FIFO)
+
+```cpp
+#include <queue>
+
+std::queue<std::string> pedidos;
+pedidos.push("Pedido#1: Laptop");
+pedidos.push("Pedido#2: Mouse");
+
+while (!pedidos.empty()) {
+    std::cout << "Procesando: " << pedidos.front() << "\n";
+    pedidos.pop();
+}
+```
+
+## Módulo 4: Reabastecimiento con `std::stack` (LIFO)
+
+```cpp
+#include <stack>
+
+std::stack<std::pair<std::string, int>> lotes;
+lotes.push({"Mouse", 10});
+lotes.push({"Laptop", 2});
+lotes.push({"Teclado", 5}); // ← procesado primero
+
+while (!lotes.empty()) {
+    auto [prod, cant] = lotes.top();
+    std::cout << "Reabasteciendo: " << cant << " de " << prod << "\n";
+    lotes.pop();
+}
+```
+
+## Módulo 5: Carrito con `std::vector`
+
+```cpp
+#include <vector>
+
+std::vector<std::string> carrito;
+carrito.push_back("Laptop");
+carrito.push_back("Mouse");
+
+for (const auto& item : carrito) {
+    std::cout << "- " << item << "\n";
+}
+```
+
+## Prueba el Código
+
+import LabRunner from '@components/labs/LabRunner.astro';
+
+<LabRunner language="cpp" rawCode={`#include <iostream>\n#include <map>\n#include <set>\n#include <queue>\n#include <stack>\n#include <vector>\n\nint main() {\n    // MAP\n    std::map<std::string,int> inv;\n    inv["Laptop"]=5; inv["Mouse"]=20;\n    for(auto&[p,c]:inv) std::cout<<p<<":"<<c<<"\\n";\n\n    // SET\n    std::set<std::string> cats;\n    cats.insert("Electronica"); cats.insert("Electronica");\n    std::cout<<"Categorias: "<<cats.size()<<"\\n"; // 1\n\n    // QUEUE\n    std::queue<std::string> q;\n    q.push("P1"); q.push("P2");\n    while(!q.empty()){std::cout<<"->:"<<q.front()<<"\\n";q.pop();}\n\n    // STACK\n    std::stack<std::string> s;\n    s.push("A"); s.push("B");\n    while(!s.empty()){std::cout<<"<-:"<<s.top()<<"\\n";s.pop();}\n\n    // VECTOR\n    std::vector<int> v={1,2,3,4,5};\n    for(int x:v) std::cout<<x<<" ";\n    return 0;\n}`} />

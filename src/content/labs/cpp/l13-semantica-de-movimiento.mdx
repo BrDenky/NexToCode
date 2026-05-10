@@ -1,0 +1,128 @@
+---
+titulo: "Semántica de Movimiento — Optimización de Memoria"
+descripcion: "Comprende una de las mejoras de rendimiento más importantes de C++11: std::move y la semántica de movimiento. Implementa constructores y operadores de copia y movimiento en una clase Buffer y mide la diferencia de rendimiento con chrono."
+lenguaje: "cpp"
+dificultad: 5
+etiquetas: ["move-semantics", "rvalue-references", "RAII", "performance", "chrono", "copy-constructor"]
+fecha: 2024-04-20
+---
+
+## Objetivo
+
+Entender a profundidad la **semántica de movimiento** de C++11: cómo transferir recursos entre objetos sin copiarlos, implementando manualmente los constructores y operadores de copia y movimiento, y midiendo el impacto real en rendimiento.
+
+## ¿Por qué existe `std::move`?
+
+Antes de C++11, la única forma de "transferir" un objeto era **copiarlo**: copiar todos sus datos a memoria nueva. Para objetos grandes (vectores de millones de elementos, buffers de red), esto era catastrophicamente lento.
+
+`std::move` convierte un L-value en una R-value reference, señalizando al compilador que los recursos de ese objeto pueden ser **robados** (movidos), no copiados.
+
+```cpp
+std::vector<int> v1 = {1, 2, 3, 4};
+std::vector<int> v2 = v1;             // Copia: aloca nueva memoria, copia 4 ints
+std::vector<int> v3 = std::move(v1); // Movimiento: transfiere el puntero interno
+
+// v1.size() == 0  ← v1 quedó "vacío" pero en estado válido
+// v3.size() == 4  ← v3 ahora posee los datos
+```
+
+## La Regla de los Cinco (Rule of Five)
+
+Si una clase gestiona recursos (memoria dinámica, archivos, sockets), debe implementar los cinco especiales:
+
+1. **Constructor** — inicializa el recurso
+2. **Destructor** — libera el recurso
+3. **Copy Constructor** — copia profunda del recurso
+4. **Copy Assignment** — copia profunda en asignación
+5. **Move Constructor** — transfiere el recurso (pone el original en nullptr)
+6. **Move Assignment** — transfiere el recurso en asignación
+
+## Implementación: Clase `Buffer`
+
+```cpp
+class Buffer {
+    int*   data;
+    size_t size;
+
+public:
+    // 1. Constructor
+    Buffer(size_t s) : size(s), data(new int[s]) {}
+
+    // 2. Destructor
+    ~Buffer() { delete[] data; }
+
+    // 3. Copy Constructor — copia profunda (O(n))
+    Buffer(const Buffer& other) : size(other.size), data(new int[other.size]) {
+        std::copy(other.data, other.data + other.size, data);
+    }
+
+    // 4. Copy Assignment
+    Buffer& operator=(const Buffer& other) {
+        if (this != &other) {
+            delete[] data;
+            size = other.size;
+            data = new int[size];
+            std::copy(other.data, other.data + size, data);
+        }
+        return *this;
+    }
+
+    // 5. Move Constructor — O(1): solo copia el puntero
+    Buffer(Buffer&& other) noexcept : data(other.data), size(other.size) {
+        other.data = nullptr; // ← importante: evita double-free
+        other.size = 0;
+    }
+
+    // 6. Move Assignment
+    Buffer& operator=(Buffer&& other) noexcept {
+        if (this != &other) {
+            delete[] data;
+            data = other.data;
+            size = other.size;
+            other.data = nullptr;
+            other.size = 0;
+        }
+        return *this;
+    }
+};
+```
+
+## Benchmark: Copia vs. Movimiento
+
+```cpp
+#include <chrono>
+
+const size_t SIZE = 10'000'000; // 10 millones de ints
+
+Buffer original(SIZE);
+
+// Medir copia — O(n): aloca y copia 10M enteros
+auto t0 = std::chrono::high_resolution_clock::now();
+Buffer copia = original;
+auto t1 = std::chrono::high_resolution_clock::now();
+
+// Medir movimiento — O(1): solo transfiere 2 punteros
+auto t2 = std::chrono::high_resolution_clock::now();
+Buffer movido = std::move(original);
+auto t3 = std::chrono::high_resolution_clock::now();
+
+auto ms_copia  = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+auto ms_movido = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
+
+// Resultado típico:
+// Copia:     ~8 ms
+// Movimiento: ~0 ms  ← constante independiente del tamaño
+```
+
+## Preguntas de Reflexión
+
+- ¿Qué pasa si no defines el move constructor y alguien usa `std::move` en tu clase?
+  → El compilador usa el copy constructor, perdiendo la optimización (o puede haber errores de doble liberación).
+- ¿Por qué el move constructor declara `noexcept`?
+  → Permite que contenedores STL (como `std::vector`) usen movimiento durante sus reasignaciones internas, lo que es esencial para la seguridad de excepciones.
+
+## Prueba el Código
+
+import LabRunner from '@components/labs/LabRunner.astro';
+
+<LabRunner language="cpp" rawCode={`#include <iostream>\n#include <vector>\n#include <chrono>\n\nint main() {\n    std::vector<int> v1={1,2,3,4};\n    std::vector<int> v2=v1;            // copia\n    std::vector<int> v3=std::move(v1); // movimiento\n    std::cout<<"v1.size="<<v1.size()<<" v2.size="<<v2.size()<<" v3.size="<<v3.size()<<"\\n";\n    // v1=0, v2=4, v3=4\n\n    // Benchmark con vector grande\n    const size_t N=5000000;\n    std::vector<int> big(N,42);\n\n    auto t0=std::chrono::high_resolution_clock::now();\n    std::vector<int> copied=big;\n    auto t1=std::chrono::high_resolution_clock::now();\n\n    auto t2=std::chrono::high_resolution_clock::now();\n    std::vector<int> moved=std::move(big);\n    auto t3=std::chrono::high_resolution_clock::now();\n\n    std::cout<<"Copia: "<<std::chrono::duration_cast<std::chrono::milliseconds>(t1-t0).count()<<"ms\\n";\n    std::cout<<"Move:  "<<std::chrono::duration_cast<std::chrono::milliseconds>(t3-t2).count()<<"ms\\n";\n    return 0;\n}`} />

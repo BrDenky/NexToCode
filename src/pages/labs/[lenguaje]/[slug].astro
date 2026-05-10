@@ -1,0 +1,33 @@
+---
+import { getCollection, render } from 'astro:content';
+import LabLayout from '../../../layouts/LabLayout.astro';
+
+export async function getStaticPaths() {
+  const labs = await getCollection('labs');
+  return labs.map((lab) => {
+    const parts = lab.id.split('/');
+    const lenguaje = parts[0];
+    const slug = parts[parts.length - 1].replace(/\.mdx?$/, '');
+    return {
+      params: { lenguaje, slug },
+      props: { lab },
+    };
+  });
+}
+
+const { lab } = Astro.props;
+const { Content } = await render(lab);
+const { titulo, descripcion, lenguaje, dificultad, etiquetas, fecha, godboltId } = lab.data;
+---
+
+<LabLayout
+  titulo={titulo}
+  descripcion={descripcion}
+  lenguaje={lenguaje}
+  dificultad={dificultad}
+  etiquetas={etiquetas}
+  fecha={fecha}
+  godboltId={godboltId}
+>
+  <Content />
+</LabLayout>

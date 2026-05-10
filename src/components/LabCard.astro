@@ -1,0 +1,78 @@
+---
+interface Props {
+  titulo: string;
+  descripcion: string;
+  lenguaje: string;
+  dificultad: number;
+  etiquetas: string[];
+  fecha: Date;
+  slug: string;
+}
+
+const { titulo, descripcion, lenguaje, dificultad, etiquetas, fecha, slug } = Astro.props;
+
+const langColors: Record<string, string> = {
+  cpp: '#00ADB5',
+  python: '#3572A5',
+  rust: '#DEA584',
+  javascript: '#f7df1e',
+};
+const langLabels: Record<string, string> = {
+  cpp: 'C++',
+  python: 'Python',
+  rust: 'Rust',
+  javascript: 'JavaScript',
+};
+
+const color = langColors[lenguaje] ?? '#6c5ce7';
+const label = langLabels[lenguaje] ?? lenguaje;
+const diffStars = Array.from({ length: 5 }, (_, i) => i < dificultad ? '★' : '☆').join('');
+const formattedDate = fecha.toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' });
+
+// Extract just the slug part after the language prefix
+const slugPart = slug.split('/').pop() ?? slug;
+const href = `/labs/${lenguaje}/${slugPart}`;
+---
+
+<a href={href} class="group block rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+  style="background-color: var(--color-surface); border-color: var(--color-border);">
+
+  <!-- Language badge + difficulty -->
+  <div class="flex items-center justify-between mb-4">
+    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+      style={`background-color: ${color}22; color: ${color}; border: 1px solid ${color}44;`}>
+      {label}
+    </span>
+    <span class="text-sm font-mono" style="color: var(--color-accent);" title={`Dificultad: ${dificultad}/5`}>
+      {diffStars}
+    </span>
+  </div>
+
+  <!-- Title & description -->
+  <h3 class="text-lg font-bold mb-2 group-hover:underline transition-colors" style="color: var(--color-text-primary);">
+    {titulo}
+  </h3>
+  <p class="text-sm leading-relaxed line-clamp-2 mb-4" style="color: var(--color-text-secondary);">
+    {descripcion}
+  </p>
+
+  <!-- Tags -->
+  <div class="flex flex-wrap gap-1 mb-4">
+    {etiquetas.slice(0, 3).map((tag) => (
+      <span class="px-2 py-0.5 rounded text-xs font-mono" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
+        #{tag}
+      </span>
+    ))}
+    {etiquetas.length > 3 && (
+      <span class="text-xs" style="color: var(--color-text-secondary);">+{etiquetas.length - 3} más</span>
+    )}
+  </div>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-between text-xs" style="color: var(--color-text-secondary);">
+    <span>{formattedDate}</span>
+    <span class="group-hover:translate-x-1 transition-transform inline-block" style="color: var(--color-accent);">
+      Ver laboratorio →
+    </span>
+  </div>
+</a>

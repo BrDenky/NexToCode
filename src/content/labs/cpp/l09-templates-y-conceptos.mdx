@@ -1,0 +1,127 @@
+---
+titulo: "Templates y Conceptos — Programación Genérica"
+descripcion: "Domina la programación genérica en C++ con templates de función y clase, plantillas variádicas para argumentos múltiples, C++20 Concepts para restringir tipos, y metaprogramación en tiempo de compilación con Factorial y Fibonacci."
+lenguaje: "cpp"
+dificultad: 4
+etiquetas: ["templates", "generics", "concepts", "variadic", "metaprogramacion", "constexpr"]
+fecha: 2024-04-01
+---
+
+## Objetivo
+
+Escribir código genérico y reutilizable usando **Templates** de C++, restricciones de tipo con **Concepts** de C++20, y cálculos en tiempo de compilación con **metaprogramación de templates**.
+
+## 1. Templates de Función
+
+Un template permite que una función funcione con cualquier tipo `T`:
+
+```cpp
+template <typename T>
+T maxValue(T a, T b) {
+    return (a > b) ? a : b;
+}
+
+// El compilador genera versiones específicas según el uso:
+maxValue(2, 8);                    // int
+maxValue(4.5, 1.5);               // double
+maxValue(std::string("A"), "Z"); // string
+```
+
+### Sobrecarga con más parámetros
+
+```cpp
+template <typename T>
+T maxValue(T a, T b, T c) {
+    return maxValue(a, maxValue(b, c)); // Reutiliza la versión de 2 params
+}
+```
+
+## 2. C++20 Concepts — Restricción de Tipos
+
+Un **Concept** es una restricción que dice qué tipos son válidos para un template:
+
+```cpp
+#include <concepts>
+
+// Solo acepta tipos integrales (int, long) o de punto flotante (float, double)
+template <typename T>
+concept Numerico = std::integral<T> || std::floating_point<T>;
+
+template <Numerico T>
+T sumar(T a, T b) {
+    return a + b;
+}
+
+sumar(5, 3);       // ✅ int
+sumar(1.5, 2.5);   // ✅ double
+// sumar("a", "b"); // ❌ Error de compilación claro y descriptivo
+```
+
+## 3. Templates Variádicos — Múltiples Parámetros
+
+Los templates variádicos usan `...` para aceptar cualquier cantidad y tipo de argumentos:
+
+```cpp
+// Caso base: un solo argumento
+template <typename T>
+void imprimirTodo(T t) {
+    std::cout << t << "\n";
+}
+
+// Caso recursivo: N argumentos
+template <typename T, typename... Args>
+void imprimirTodo(T t, Args... args) {
+    std::cout << t << " ";
+    imprimirTodo(args...); // Recursión hasta el caso base
+}
+
+imprimirTodo(8, 4.5, "Mateo", 'P'); // 8 4.5 Mateo P
+```
+
+### Sumatoria variádica
+
+```cpp
+template <typename T>
+T suma(T t) { return t; }
+
+template <typename T, typename... Args>
+T suma(T t, Args... args) {
+    return t + suma(args...);
+}
+
+suma(8, 7, 1, 4); // 20
+```
+
+## 4. Metaprogramación — Cálculos en Tiempo de Compilación
+
+El compilador puede calcular resultados durante la compilación, no en ejecución:
+
+```cpp
+// Factorial en tiempo de compilación
+template <int N>
+struct Factorial {
+    static constexpr int value = N * Factorial<N-1>::value;
+};
+template <>
+struct Factorial<0> {  // Caso base
+    static constexpr int value = 1;
+};
+
+// Fibonacci en tiempo de compilación
+template <int N>
+struct Fibonacci {
+    static constexpr int value = Fibonacci<N-1>::value + Fibonacci<N-2>::value;
+};
+template <> struct Fibonacci<0> { static constexpr int value = 0; };
+template <> struct Fibonacci<1> { static constexpr int value = 1; };
+
+// Uso: valor calculado en COMPILACIÓN, no en ejecución
+constexpr int fact5 = Factorial<5>::value;  // 120
+constexpr int fib15 = Fibonacci<15>::value; // 610
+```
+
+## Prueba el Código
+
+import LabRunner from '@components/labs/LabRunner.astro';
+
+<LabRunner language="cpp" rawCode={`#include <iostream>\n#include <concepts>\n\n// Template basico\ntemplate<typename T>\nT maxVal(T a, T b){ return a>b?a:b; }\n\n// Concept C++20\ntemplate<typename T>\nconcept Numerico = std::integral<T>||std::floating_point<T>;\ntemplate<Numerico T>\nT sumar(T a, T b){ return a+b; }\n\n// Variadic\ntemplate<typename T> void print(T t){std::cout<<t<<"\\n";}\ntemplate<typename T,typename...A> void print(T t,A...a){std::cout<<t<<" ";print(a...);}\n\n// Metaprogramacion\ntemplate<int N> struct Fact{static constexpr int v=N*Fact<N-1>::v;};\ntemplate<> struct Fact<0>{static constexpr int v=1;};\n\nint main(){\n    std::cout<<maxVal(2,8)<<"\\n";         // 8\n    std::cout<<sumar(1.5,2.5)<<"\\n";     // 4\n    print(8,4.5,"Hola",'Z');             // 8 4.5 Hola Z\n    constexpr int f=Fact<5>::v;\n    std::cout<<"5!="<<f<<"\\n";           // 120\n    return 0;\n}`} />

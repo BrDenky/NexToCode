@@ -1,0 +1,154 @@
+---
+titulo: "Analizador de Datos Retail — CLI y CSV en C++"
+descripcion: "Aplicación de línea de comandos (CLI) que lee y analiza un dataset real de transacciones de retail en CSV. Utiliza la librería CLI11 para parsear argumentos, std::unordered_map para agregaciones y std::ifstream para lectura de archivos."
+lenguaje: "cpp"
+dificultad: 4
+etiquetas: ["CLI", "CSV", "file-io", "unordered_map", "CLI11", "data-analysis", "structured-bindings"]
+fecha: 2024-05-01
+---
+
+## Objetivo
+
+Construir una herramienta de línea de comandos en C++ que procese un dataset real de ventas retail, demostrando el uso de E/S de archivos, contenedores hash y parseo de argumentos con una librería profesional.
+
+## Herramientas Utilizadas
+
+| Herramienta | Propósito |
+|-------------|-----------|
+| `std::ifstream` | Leer el archivo CSV línea por línea |
+| `std::stringstream` | Parsear cada línea separada por comas |
+| `std::unordered_map` | Agregar transacciones por país en O(1) amortizado |
+| `CLI11` | Parsear argumentos de la línea de comandos con flags y opciones |
+| Structured bindings | Iterar el map con `auto& [pais, total]` |
+
+## Dataset
+
+El dataset (`Online Retail.csv`) contiene transacciones de una tienda en línea del Reino Unido con columnas:
+`InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country`
+
+## Arquitectura del Programa
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <unordered_map>
+#include "CLI11.hpp"
+
+struct Transaction {
+    std::string country;
+    int         quantity;
+    double      unit_price;
+};
+```
+
+### Paso 1: Leer el CSV
+
+```cpp
+std::vector<Transaction> leerCSV(const std::string& archivo) {
+    std::vector<Transaction> datos;
+    std::ifstream file(archivo);
+    std::string linea;
+
+    std::getline(file, linea); // Saltar el header
+
+    while (std::getline(file, linea)) {
+        std::stringstream ss(linea);
+        std::string token;
+        std::vector<std::string> row;
+
+        while (std::getline(ss, token, ',')) {
+            row.push_back(token);
+        }
+
+        if (row.size() >= 8) {
+            try {
+                datos.push_back({
+                    row[7],              // Country
+                    std::stoi(row[3]),   // Quantity
+                    std::stod(row[5])    // UnitPrice
+                });
+            } catch (...) { continue; } // Ignorar filas con datos corruptos
+        }
+    }
+    return datos;
+}
+```
+
+### Paso 2: Agregar Transacciones por País
+
+```cpp
+void transaccionesPorPais(const std::vector<Transaction>& datos,
+                           const std::string& filtroPais = "") {
+    std::unordered_map<std::string, int> conteo;
+
+    for (const auto& t : datos) {
+        if (filtroPais.empty() || t.country == filtroPais) {
+            conteo[t.country]++;
+        }
+    }
+
+    // C++17 Structured Bindings
+    for (const auto& [pais, total] : conteo) {
+        std::cout << std::left << std::setw(20) << pais
+                  << ": " << total << " transacciones\n";
+    }
+}
+```
+
+### Paso 3: Interfaz CLI con CLI11
+
+```cpp
+int main(int argc, char** argv) {
+    CLI::App app{"Analizador de Ventas Retail"};
+
+    std::string pais;
+    bool soloUK    = false;
+    bool verTotal  = false;
+
+    app.add_option("--country", pais,     "Filtrar por país");
+    app.add_flag("--only-uk",   soloUK,   "Solo UK para el total");
+    app.add_flag("--total",     verTotal, "Mostrar monto total de ventas");
+
+    CLI11_PARSE(app, argc, argv);
+
+    auto datos = leerCSV("Online Retail.csv");
+
+    if (verTotal) {
+        mostrarTotal(datos, soloUK);
+    } else {
+        transaccionesPorPais(datos, pais);
+    }
+}
+```
+
+## Uso desde la Terminal
+
+```bash
+# Ver todas las transacciones por país
+./retail_app
+
+# Filtrar solo un país
+./retail_app --country "Germany"
+
+# Ver monto total de ventas
+./retail_app --total
+
+# Ver monto total solo del Reino Unido
+./retail_app --total --only-uk
+```
+
+## Conceptos Avanzados Aplicados
+
+- **RAII con `std::ifstream`**: el archivo se cierra automáticamente al salir del scope, sin necesidad de llamar a `file.close()`.
+- **`std::unordered_map` vs `std::map`**: el primero usa una tabla hash con O(1) promedio para inserción/búsqueda, ideal para grandes datasets.
+- **Manejo robusto de errores**: bloques `try/catch` en el parseo para tolerar filas corruptas o con datos faltantes.
+
+> **Nota:** Este lab requiere el archivo `Online Retail.csv` y la cabecera `CLI11.hpp`. Para probarlo en Compiler Explorer, consulta la versión simplificada abajo.
+
+## Prueba una Versión Simplificada
+
+import LabRunner from '@components/labs/LabRunner.astro';
+
+<LabRunner language="cpp" rawCode={`#include <iostream>\n#include <sstream>\n#include <vector>\n#include <unordered_map>\n#include <iomanip>\n\nstruct Transaction { std::string country; int qty; double price; };\n\nint main() {\n    // Simular datos del CSV en memoria\n    std::vector<Transaction> datos = {\n        {"United Kingdom", 6,  2.55},\n        {"France",         2,  3.39},\n        {"United Kingdom", 8,  2.75},\n        {"Germany",        4,  3.75},\n        {"France",         6,  1.65},\n        {"Germany",        2,  4.25},\n    };\n\n    // Contar transacciones por pais\n    std::unordered_map<std::string,int> conteo;\n    double total = 0.0;\n    for(const auto& t: datos){\n        conteo[t.country]++;\n        total += t.qty * t.price;\n    }\n\n    std::cout << "--- Transacciones por Pais ---\\n";\n    for(const auto& [pais, n]: conteo)\n        std::cout << std::left << std::setw(20) << pais << ": " << n << "\\n";\n\n    std::cout << "\\nTotal ventas: " << std::fixed << std::setprecision(2) << total << "\\n";\n    return 0;\n}`} />

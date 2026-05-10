@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LabCard from '../../components/LabCard.astro';
+import { getCollection } from 'astro:content';
+
+const allLabs = await getCollection('labs');
+
+// Get unique languages
+const languages = [...new Set(allLabs.map((lab) => lab.data.lenguaje))];
+
+// Sort by date descending
+const sortedLabs = allLabs.sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+---
+
+<BaseLayout title="Laboratorios" description="Todos los laboratorios de programación en NexToCode.">
+  <div class="max-w-6xl mx-auto px-6 py-16">
+
+    <!-- Page Header -->
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold mb-3" style="color: var(--color-text-primary);">Laboratorios</h1>
+      <p class="text-lg" style="color: var(--color-text-secondary);">
+        {allLabs.length} laboratorio{allLabs.length !== 1 ? 's' : ''} disponible{allLabs.length !== 1 ? 's' : ''}.
+        Filtros interactivos para encontrar exactamente lo que buscas.
+      </p>
+    </header>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 mb-10" id="filter-container">
+      <button
+        class="filter-btn active px-4 py-2 rounded-full text-sm font-medium border transition-all"
+        data-filter="all"
+        style="background-color: var(--color-accent); color: white; border-color: var(--color-accent);"
+      >
+        Todos ({allLabs.length})
+      </button>
+
+      {languages.map((lang) => {
+        const count = allLabs.filter(l => l.data.lenguaje === lang).length;
+        const labels = { cpp: 'C++', python: 'Python', rust: 'Rust', javascript: 'JavaScript' } as const;
+        const labelText = labels[lang as keyof typeof labels] ?? lang;
+        return (
+          <button
+            class="filter-btn px-4 py-2 rounded-full text-sm font-medium border transition-all"
+            data-filter={lang}
+            style="background-color: var(--color-surface); color: var(--color-text-secondary); border-color: var(--color-border);"
+          >
+            {labelText} ({count})
+          </button>
+        );
+      })}
+
+
+      <!-- Difficulty filter -->
+      <div class="ml-auto flex items-center gap-2">
+        <label for="diff-filter" class="text-sm" style="color: var(--color-text-secondary);">Dificultad máx:</label>
+        <select id="diff-filter" class="text-sm px-3 py-2 rounded-lg border"
+          style="background-color: var(--color-surface); color: var(--color-text-primary); border-color: var(--color-border);">
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★</option>
+          <option value="3">★★★</option>
+          <option value="2">★★</option>
+          <option value="1">★</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Labs Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="labs-grid">
+      {sortedLabs.map((lab) => {
+        const slugPart = lab.id.split('/').pop() ?? lab.id;
+        return (
+          <div class="lab-item" data-lang={lab.data.lenguaje} data-diff={lab.data.dificultad}>
+            <LabCard
+              titulo={lab.data.titulo}
+              descripcion={lab.data.descripcion}
+              lenguaje={lab.data.lenguaje}
+              dificultad={lab.data.dificultad}
+              etiquetas={lab.data.etiquetas}
+              fecha={lab.data.fecha}
+              slug={`${lab.data.lenguaje}/${slugPart}`}
+            />
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden text-center py-20">
+      <p class="text-4xl mb-4">🔍</p>
+      <p class="text-lg font-medium" style="color: var(--color-text-primary);">No se encontraron laboratorios</p>
+      <p class="text-sm mt-1" style="color: var(--color-text-secondary);">Prueba cambiando los filtros.</p>
+    </div>
+  </div>
+
+  <script>
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const diffSelect = document.getElementById('diff-filter') as HTMLSelectElement;
+    const items = document.querySelectorAll<HTMLElement>('.lab-item');
+    const emptyState = document.getElementById('empty-state');
+
+    let currentLang = 'all';
+    let currentDiff = 5;
+
+    function applyFilters() {
+      let visible = 0;
+      items.forEach((item) => {
+        const lang = item.dataset.lang ?? '';
+        const diff = parseInt(item.dataset.diff ?? '5');
+        const show = (currentLang === 'all' || lang === currentLang) && diff <= currentDiff;
+        item.style.display = show ? 'block' : 'none';
+        if (show) visible++;
+      });
+      if (emptyState) emptyState.classList.toggle('hidden', visible > 0);
+    }
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        currentLang = btn.dataset.filter ?? 'all';
+
+        filterBtns.forEach((b) => {
+          b.style.cssText = 'background-color: var(--color-surface); color: var(--color-text-secondary); border-color: var(--color-border);';
+        });
+        btn.style.cssText = 'background-color: var(--color-accent); color: white; border-color: var(--color-accent);';
+
+        applyFilters();
+      });
+    });
+
+    diffSelect?.addEventListener('change', () => {
+      currentDiff = parseInt(diffSelect.value);
+      applyFilters();
+    });
+  </script>
+</BaseLayout>

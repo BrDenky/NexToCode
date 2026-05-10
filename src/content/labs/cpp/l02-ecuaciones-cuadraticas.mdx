@@ -1,0 +1,83 @@
+---
+titulo: "Ecuaciones Cuadráticas — Manejo de Excepciones"
+descripcion: "Resuelve ecuaciones cuadráticas de la forma ax²+bx+c=0, clasificando las raíces en reales distintas, reales iguales o complejas. Introducción al manejo de errores con excepciones en C++."
+lenguaje: "cpp"
+dificultad: 2
+etiquetas: ["matematicas", "excepciones", "sqrt", "discriminante"]
+fecha: 2024-02-15
+---
+
+## Objetivo
+
+Implementar una función que resuelva ecuaciones cuadráticas de la forma **ax² + bx + c = 0**, aplicando la fórmula general y clasificando los resultados según el valor del discriminante.
+
+## Conceptos Clave
+
+### El Discriminante
+
+El discriminante `D = b² - 4ac` determina la naturaleza de las raíces:
+
+| Condición | Tipo de raíces |
+|-----------|---------------|
+| `D > 0`   | Reales y distintas |
+| `D = 0`   | Reales e iguales |
+| `D < 0`   | Complejas |
+
+### Manejo de Excepciones
+
+Cuando `a = 0`, la ecuación deja de ser cuadrática. En lugar de producir una división por cero silenciosa, la función retorna un mensaje de error de forma controlada.
+
+## Implementación
+
+```cpp
+#include <iostream>
+#include <cmath>
+
+void resolverCuadratica(double a, double b, double c) {
+    if (a == 0) {
+        std::cout << "El coeficiente 'a' no puede ser cero.\n";
+        return;
+    }
+
+    double D = b * b - 4 * a * c;
+
+    if (D > 0) {
+        double x1 = (-b + std::sqrt(D)) / (2 * a);
+        double x2 = (-b - std::sqrt(D)) / (2 * a);
+        std::cout << "Raíces reales y distintas:\n";
+        std::cout << "x1 = " << x1 << "\n";
+        std::cout << "x2 = " << x2 << "\n";
+    } else if (D == 0) {
+        double root = -b / (2 * a);
+        std::cout << "Raíz real doble:\n";
+        std::cout << "x = " << root << "\n";
+    } else {
+        double real = -b / (2 * a);
+        double imag = std::sqrt(-D) / (2 * a);
+        std::cout << "Raíces complejas:\n";
+        std::cout << "x1 = " << real << " + " << imag << "i\n";
+        std::cout << "x2 = " << real << " - " << imag << "i\n";
+    }
+}
+
+int main() {
+    resolverCuadratica(1, -5, 6);   // x=3, x=2
+    resolverCuadratica(1, -2, 1);   // x=1 (doble)
+    resolverCuadratica(1, 0, 4);    // Complejas
+    resolverCuadratica(0, 3, 1);    // Error
+    return 0;
+}
+```
+
+## Análisis de Casos de Prueba
+
+- `(1, -5, 6)` → D = 1 → raíces reales: **x = 3** y **x = 2**
+- `(1, -2, 1)` → D = 0 → raíz doble: **x = 1**
+- `(1, 0, 4)` → D = -16 → raíces complejas: **0 ± 2i**
+- `(0, 3, 1)` → Error controlado
+
+## Prueba el Código
+
+import LabRunner from '@components/labs/LabRunner.astro';
+
+<LabRunner language="cpp" rawCode={`#include <iostream>\n#include <cmath>\n\nvoid resolverCuadratica(double a, double b, double c) {\n    if (a == 0) { std::cout << "Error: a no puede ser cero\\n"; return; }\n    double D = b*b - 4*a*c;\n    if (D > 0) {\n        std::cout << "x1=" << (-b+std::sqrt(D))/(2*a) << " x2=" << (-b-std::sqrt(D))/(2*a) << "\\n";\n    } else if (D == 0) {\n        std::cout << "x=" << -b/(2*a) << "\\n";\n    } else {\n        std::cout << -b/(2*a) << " +/- " << std::sqrt(-D)/(2*a) << "i\\n";\n    }\n}\nint main() {\n    resolverCuadratica(1,-5,6);\n    resolverCuadratica(1,-2,1);\n    resolverCuadratica(1,0,4);\n    return 0;\n}`} />

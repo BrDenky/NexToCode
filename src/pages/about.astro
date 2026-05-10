@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Sobre mí" description="Conoce al creador de NexToCode.">
+  <div class="max-w-3xl mx-auto px-6 py-20">
+
+    <!-- Avatar + name -->
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-8 mb-14">
+      <div class="w-28 h-28 rounded-full flex items-center justify-center text-5xl flex-shrink-0 border-4"
+        style="background: linear-gradient(135deg, var(--color-accent), #00adb5); border-color: var(--color-accent-subtle);">
+        👨‍💻
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--color-text-primary);">Hola, soy el autor de NexToCode</h1>
+        <p class="text-lg" style="color: var(--color-accent);">Desarrollador · Estudiante de C++ · Aprendiz perpetuo</p>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="space-y-8" style="color: var(--color-text-secondary); line-height: 1.8;">
+      <div class="p-6 rounded-2xl border" style="background-color: var(--color-surface); border-color: var(--color-border);">
+        <h2 class="text-xl font-bold mb-3" style="color: var(--color-text-primary);">¿Qué es NexToCode?</h2>
+        <p>
+          NexToCode nació como una forma de documentar mi aprendizaje y construir un portafolio técnico sólido.
+          Cada laboratorio que publico aquí representa un concepto que estudié, practiqué y quiero enseñar
+          de forma clara y directa, con código ejecutable.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl border" style="background-color: var(--color-surface); border-color: var(--color-border);">
+        <h2 class="text-xl font-bold mb-3" style="color: var(--color-text-primary);">¿Qué encontrarás aquí?</h2>
+        <ul class="space-y-2">
+          {[
+            '🚀 Laboratorios de C++ Moderno (C++17/20/23)',
+            '🐍 Próximamente: Python para Ciencia de Datos',
+            '🦀 En el horizonte: Rust para Sistemas',
+            '💡 Explicaciones teóricas con código ejecutable',
+          ].map(item => (
+            <li class="flex items-start gap-2">
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border" style="background-color: var(--color-surface); border-color: var(--color-border);">
+        <h2 class="text-xl font-bold mb-3" style="color: var(--color-text-primary);">Stack Tecnológico del Blog</h2>
+        <div class="flex flex-wrap gap-2">
+          {['Astro', 'Tailwind CSS', 'MDX', 'Shiki', 'Compiler Explorer', 'Vercel'].map(tech => (
+            <span class="px-3 py-1 rounded-full text-sm font-mono border"
+              style="background-color: var(--color-accent-subtle); color: var(--color-accent); border-color: var(--color-accent);">
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 text-center">
+      <a href="/labs"
+        class="inline-block px-8 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 hover:shadow-lg"
+        style="background: linear-gradient(135deg, var(--color-accent), #00adb5);">
+        Explorar los laboratorios →
+      </a>
+    </div>
+
+  </div>
+</BaseLayout>
