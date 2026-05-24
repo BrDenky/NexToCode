@@ -1,28 +1,53 @@
 @import "tailwindcss";
 
+@theme {
+  --font-arcade: "Press Start 2P", var(--font-mono);
+  --font-retro: "VT323", var(--font-mono);
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-bg: var(--color-bg-var);
+  --color-surface: var(--color-surface-var);
+  --color-border: var(--color-border-var);
+  --color-text-primary: var(--color-text-primary-var);
+  --color-text-secondary: var(--color-text-secondary-var);
+  --color-accent: var(--color-accent-var);
+  --color-accent-hover: var(--color-accent-hover-var);
+  --color-accent-subtle: var(--color-accent-subtle-var);
+  --color-code-bg: var(--color-code-bg-var);
+  --color-shadow: var(--color-shadow-var);
+}
+
 @layer base {
   :root {
-    --color-bg: #f9fafb;
-    --color-surface: #ffffff;
-    --color-border: #e5e7eb;
-    --color-text-primary: #111827;
-    --color-text-secondary: #6b7280;
-    --color-accent: #6c5ce7;
-    --color-accent-hover: #5a4bd1;
-    --color-accent-subtle: #ede9fe;
-    --color-code-bg: #1e1e2e;
+    --color-bg-var: #f0efe9;
+    /* Retro arcade casing beige */
+    --color-surface-var: #ffffff;
+    --color-border-var: #000000;
+    --color-text-primary-var: #000000;
+    --color-text-secondary-var: #403f4c;
+    --color-accent-var: #d90066;
+    /* Retro red/pink */
+    --color-accent-hover-var: #b30052;
+    --color-accent-subtle-var: #ffebf4;
+    --color-code-bg-var: #1a1923;
+    --color-shadow-var: #000000;
   }
 
   .dark {
-    --color-bg: #0f0f1a;
-    --color-surface: #1a1a2e;
-    --color-border: #2d2d4a;
-    --color-text-primary: #f1f0ff;
-    --color-text-secondary: #a29bfe;
-    --color-accent: #a29bfe;
-    --color-accent-hover: #b8b0ff;
-    --color-accent-subtle: #2d2b5a;
-    --color-code-bg: #13131f;
+    --color-bg-var: #080710;
+    /* Retro space black */
+    --color-surface-var: #131124;
+    /* Arcade CRT bezel purple */
+    --color-border-var: #2f2c52;
+    --color-text-primary-var: #ffffff;
+    --color-text-secondary-var: #a0a6cc;
+    --color-accent-var: #00f0ff;
+    /* Neon cyan */
+    --color-accent-hover-var: #00c4d1;
+    --color-accent-subtle-var: #0a2538;
+    --color-code-bg-var: #0c0b16;
+    --color-shadow-var: #ff007f;
+    /* Neon pink shadow */
   }
 
   * {
@@ -32,32 +57,185 @@
   body {
     background-color: var(--color-bg);
     color: var(--color-text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: var(--font-mono);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+/* CRT Screen Effect Overlay */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.08) 50%);
+  background-size: 100% 4px;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0.4;
+}
 
-/* Prose overrides for dark mode compatibility */
+.dark .crt-overlay {
+  opacity: 0.65;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.15) 50%);
+  background-size: 100% 4px;
+}
+
+/* Retro UI Utilities */
+.btn-retro {
+  font-family: var(--font-retro);
+  font-size: 1.35rem;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--color-text-primary);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 4px 4px 0px var(--color-shadow);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  image-rendering: pixelated;
+  text-decoration: none;
+}
+
+.btn-retro:hover {
+  background-color: var(--color-accent-subtle);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-retro:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px var(--color-shadow);
+}
+
+.card-retro {
+  border: 3px solid var(--color-text-primary);
+  background-color: var(--color-surface);
+  box-shadow: 6px 6px 0px var(--color-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-retro-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px var(--color-shadow);
+}
+
+/* Double border retro style */
+.border-double-retro {
+  border: 6px double var(--color-text-primary);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+  border-left: 2px solid var(--color-text-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface);
+  border: 2px solid var(--color-text-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Typography styles */
+.font-arcade-class {
+  font-family: var(--font-arcade);
+}
+
+.font-retro-class {
+  font-family: var(--font-retro);
+}
+
+/* Prose overrides for retro design compatibility */
+.prose {
+  font-family: var(--font-mono);
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-retro);
+  font-weight: normal;
+  letter-spacing: 0.02em;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1 {
+  font-size: 2.25rem;
+}
+
+.prose h2 {
+  font-size: 1.85rem;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+}
+
+.prose p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.25em;
+}
+
 .prose code {
+  font-family: var(--font-mono);
   background-color: var(--color-code-bg) !important;
   color: #cdd6f4 !important;
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-size: 0.875em;
+  padding: 0.15em 0.35em;
+  border: 1px solid var(--color-border);
+  border-radius: 0px;
+  font-size: 0.9em;
 }
 
 .prose pre {
   background-color: var(--color-code-bg) !important;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border: 3px solid var(--color-text-primary);
+  border-radius: 0px;
+  box-shadow: 4px 4px 0px var(--color-shadow);
+  padding: 1.25rem;
+  margin: 1.5rem 0;
 }
 
 .prose pre code {
   background-color: transparent !important;
+  border: none;
   padding: 0;
+  font-size: 0.9rem;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.prose th,
+.prose td {
+  border: 2px solid var(--color-text-primary);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.prose th {
+  background-color: var(--color-accent-subtle);
+  font-family: var(--font-retro);
+  font-size: 1.2rem;
+  font-weight: normal;
 }

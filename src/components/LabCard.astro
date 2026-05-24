@@ -12,10 +12,10 @@ interface Props {
 const { titulo, descripcion, lenguaje, dificultad, etiquetas, fecha, slug } = Astro.props;
 
 const langColors: Record<string, string> = {
-  cpp: '#00ADB5',
-  python: '#3572A5',
-  rust: '#DEA584',
-  javascript: '#f7df1e',
+  cpp: '#00f0ff',
+  python: '#ffd200',
+  rust: '#ff6c00',
+  javascript: '#ffe600',
 };
 const langLabels: Record<string, string> = {
   cpp: 'C++',
@@ -24,9 +24,8 @@ const langLabels: Record<string, string> = {
   javascript: 'JavaScript',
 };
 
-const color = langColors[lenguaje] ?? '#6c5ce7';
+const color = langColors[lenguaje] ?? '#d90066';
 const label = langLabels[lenguaje] ?? lenguaje;
-const diffStars = Array.from({ length: 5 }, (_, i) => i < dificultad ? '★' : '☆').join('');
 const formattedDate = fecha.toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' });
 
 // Extract just the slug part after the language prefix
@@ -34,45 +33,64 @@ const slugPart = slug.split('/').pop() ?? slug;
 const href = `/labs/${lenguaje}/${slugPart}`;
 ---
 
-<a href={href} class="group block rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-  style="background-color: var(--color-surface); border-color: var(--color-border);">
-
-  <!-- Language badge + difficulty -->
+<a 
+  href={href} 
+  class="card-retro group block p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0px_var(--color-shadow)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+  style={`--lang-color: ${color};`}
+>
+  <!-- Language badge + difficulty meter -->
   <div class="flex items-center justify-between mb-4">
-    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
-      style={`background-color: ${color}22; color: ${color}; border: 1px solid ${color}44;`}>
+    <span 
+      class="px-3 py-1 text-xs font-arcade-class border-2 border-black dark:border-border font-bold uppercase tracking-wider bg-surface"
+      style={`color: var(--color-text-primary); border-color: ${color}; box-shadow: 2px 2px 0px ${color};`}
+    >
       {label}
     </span>
-    <span class="text-sm font-mono" style="color: var(--color-accent);" title={`Dificultad: ${dificultad}/5`}>
-      {diffStars}
-    </span>
+    
+    <!-- Difficulty Volume/Pixel Meter -->
+    <div class="flex items-center gap-1" title={`Dificultad: ${dificultad}/5`}>
+      <span class="text-xs font-retro-class uppercase mr-1" style="color: var(--color-text-secondary);">DIF:</span>
+      {Array.from({ length: 5 }, (_, i) => (
+        <span 
+          class="w-2.5 h-4 border-2 border-black dark:border-border transition-colors duration-200"
+          style={{
+            backgroundColor: i < dificultad ? color : 'transparent',
+            borderColor: i < dificultad ? color : 'var(--color-border)',
+          }}
+        />
+      ))}
+    </div>
   </div>
 
   <!-- Title & description -->
-  <h3 class="text-lg font-bold mb-2 group-hover:underline transition-colors" style="color: var(--color-text-primary);">
+  <h3 class="text-2xl font-retro-class font-bold mb-2 group-hover:text-accent transition-colors" style="color: var(--color-text-primary);">
     {titulo}
   </h3>
-  <p class="text-sm leading-relaxed line-clamp-2 mb-4" style="color: var(--color-text-secondary);">
+  
+  <p class="text-sm leading-relaxed line-clamp-2 mb-4 font-mono" style="color: var(--color-text-secondary);">
     {descripcion}
   </p>
 
-  <!-- Tags -->
-  <div class="flex flex-wrap gap-1 mb-4">
+  <!-- Tags as little floppy sectors -->
+  <div class="flex flex-wrap gap-2 mb-6">
     {etiquetas.slice(0, 3).map((tag) => (
-      <span class="px-2 py-0.5 rounded text-xs font-mono" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
+      <span 
+        class="px-2 py-0.5 text-xs font-mono border border-black dark:border-border bg-surface"
+        style={`box-shadow: 1.5px 1.5px 0px var(--color-shadow);`}
+      >
         #{tag}
       </span>
     ))}
     {etiquetas.length > 3 && (
-      <span class="text-xs" style="color: var(--color-text-secondary);">+{etiquetas.length - 3} más</span>
+      <span class="text-xs self-center font-retro-class" style="color: var(--color-text-secondary);">+{etiquetas.length - 3}</span>
     )}
   </div>
 
-  <!-- Footer -->
-  <div class="flex items-center justify-between text-xs" style="color: var(--color-text-secondary);">
+  <!-- Footer block panel -->
+  <div class="flex items-center justify-between text-xs pt-4 border-t border-dashed border-black/30 dark:border-border/30 font-retro-class text-lg" style="color: var(--color-text-secondary);">
     <span>{formattedDate}</span>
-    <span class="group-hover:translate-x-1 transition-transform inline-block" style="color: var(--color-accent);">
-      Ver laboratorio →
+    <span class="font-arcade-class text-[0.65rem] tracking-tighter group-hover:text-accent group-hover:translate-x-0.5 transition-all" style="color: var(--color-text-primary);">
+      [ INICIAR LAB > ]
     </span>
   </div>
 </a>

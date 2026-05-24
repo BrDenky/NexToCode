@@ -1,12 +1,15 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = 'Blog de laboratorios y aprendizaje de programación.' } = Astro.props;
+const {
+  title,
+  description = "Blog de laboratorios y aprendizaje de programación.",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -15,71 +18,162 @@ const { title, description = 'Blog de laboratorios y aprendizaje de programació
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+
+    <!-- Retro Fonts Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title} | NexToCode</title>
   </head>
-  <body class="min-h-screen flex flex-col font-sans antialiased">
+  <body
+    class="min-h-[100dvh] flex flex-col font-mono antialiased relative overflow-x-hidden"
+  >
+    <!-- CRT monitor screen scanlines overlay -->
+    <div class="crt-overlay"></div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 backdrop-blur-md border-b" style="background-color: color-mix(in srgb, var(--color-surface) 85%, transparent); border-color: var(--color-border);">
-      <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2 font-bold text-xl" style="color: var(--color-text-primary);">
-          <span class="text-2xl">⚡</span>
-          <span>NexTo<span style="color: var(--color-accent);">Code</span></span>
+    <!-- Header / Control Panel -->
+    <header
+      class="sticky top-0 z-50 border-b-4 border-black dark:border-border backdrop-blur-sm"
+      style="background-color: color-mix(in srgb, var(--color-surface) 90%, transparent);"
+    >
+      <nav
+        class="max-w-6xl mx-auto px-6 h-15 flex items-center justify-between"
+      >
+        <!-- Logo -->
+        <a
+          href="/"
+          class="flex items-center gap-3 font-arcade-class text-xs tracking-tight group hover:opacity-80 transition-opacity"
+          style="color: var(--color-text-primary);"
+        >
+          <!-- Pixel Lightning Bolt SVG -->
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            class="w-6 h-6 text-accent"
+            style="fill: var(--color-accent);"
+          >
+            <path
+              d="M12 2H16V4H14V6H12V8H10V10H6V12H10V10H12V8H14V6H16V4H18V2H12ZM12 12H8V14H10V16H12V18H14V20H18V22H14V20H12V18H10V16H8V14H6V12H12Z"
+              fill="currentColor"></path>
+          </svg>
+          <span>NexTo<span class="text-accent">Code</span></span>
         </a>
-        <div class="flex items-center gap-6">
-          <a href="/labs" class="text-sm font-medium transition-colors hover:underline" style="color: var(--color-text-secondary);">
-            Laboratorios
+
+        <!-- Menu Navigation tabs -->
+        <div class="flex items-center gap-4 sm:gap-6">
+          <a
+            href="/labs"
+            class="text-sm font-retro-class text-lg tracking-wide border-b-2 border-transparent hover:border-accent py-1 transition-all"
+            style="color: var(--color-text-secondary);"
+          >
+            [ Laboratorios ]
           </a>
-          <a href="/about" class="text-sm font-medium transition-colors hover:underline" style="color: var(--color-text-secondary);">
-            Sobre mí
+          <a
+            href="/about"
+            class="text-sm font-retro-class text-lg tracking-wide border-b-2 border-transparent hover:border-accent py-1 transition-all"
+            style="color: var(--color-text-secondary);"
+          >
+            [ Sobre nosotros]
           </a>
+
+          <!-- Retro styled theme toggle button -->
           <button
             id="theme-toggle"
             aria-label="Cambiar tema"
-            class="p-2 rounded-lg border text-sm transition-colors cursor-pointer"
-            style="background-color: var(--color-surface); border-color: var(--color-border); color: var(--color-text-secondary);"
+            class="p-2 border-2 border-black dark:border-border bg-surface text-text-primary cursor-pointer hover:bg-accent-subtle active:translate-y-0.5 active:translate-x-0.5 transition-transform"
+            style="box-shadow: 2px 2px 0px var(--color-shadow);"
           >
-            <span id="theme-icon">☀️</span>
+            <!-- Sun Pixel Icon -->
+            <svg
+              class="sun-icon w-5 h-5 text-accent block dark:hidden"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+            >
+              <rect x="7" y="0" width="2" height="2"></rect>
+              <rect x="7" y="14" width="2" height="2"></rect>
+              <rect x="0" y="7" width="2" height="2"></rect>
+              <rect x="14" y="7" width="2" height="2"></rect>
+              <rect x="4" y="4" width="8" height="8"></rect>
+              <rect x="2" y="2" width="2" height="2"></rect>
+              <rect x="12" y="2" width="2" height="2"></rect>
+              <rect x="2" y="12" width="2" height="2"></rect>
+              <rect x="12" y="12" width="2" height="2"></rect>
+            </svg>
+            <!-- Moon Pixel Icon -->
+            <svg
+              class="moon-icon w-5 h-5 text-accent hidden dark:block"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+            >
+              <rect x="6" y="2" width="6" height="2"></rect>
+              <rect x="4" y="4" width="2" height="8"></rect>
+              <rect x="6" y="12" width="6" height="2"></rect>
+              <rect x="10" y="4" width="4" height="2"></rect>
+              <rect x="12" y="6" width="2" height="4"></rect>
+              <rect x="10" y="10" width="4" height="2"></rect>
+            </svg>
           </button>
         </div>
       </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1">
+    <!-- Main Content Panel -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6">
       <slot />
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t py-10 mt-20" style="border-color: var(--color-border);">
-      <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p class="text-sm" style="color: var(--color-text-secondary);">
-          © {new Date().getFullYear()} NexToCode — Hecho con ❤️ y mucho C++.
+    <!-- Footer / Bottom Bezel -->
+    <footer
+      class="border-t-4 border-double border-black dark:border-border py-8 mt-20"
+      style="background-color: var(--color-surface);"
+    >
+      <div
+        class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-retro-class text-lg"
+      >
+        <p class="text-text-secondary">
+          © {new Date().getFullYear()} NexToCode — Hecho con
+          <!-- Pixel Heart SVG instead of heart emoji -->
+          <svg
+            viewBox="0 0 10 10"
+            class="w-4 h-4 inline-block text-accent fill-current animate-pulse align-middle mx-1"
+          >
+            <path
+              d="M2 1h2v1H2zm4 0h2v1H6zM1 2h3v1H1zm5 0h3v1H6zM0 3h10v1H0zm0 1h10v1H0zm1 1h8v1H1zm1 1h6v1H2zm2 1h2v1H4zm1 1h0v1H5z"
+            ></path>
+          </svg>
+          y C++.
         </p>
-        <p class="text-sm" style="color: var(--color-text-secondary);">
-          Construido con <a href="https://astro.build" target="_blank" class="underline hover:opacity-80">Astro</a>
+        <p class="text-text-secondary">
+          SYS_STATUS: <span
+            class="text-accent uppercase font-bold animate-pulse">Online</span
+          >
         </p>
       </div>
     </footer>
 
     <!-- Dark mode toggle script -->
     <script>
-      const toggle = document.getElementById('theme-toggle');
-      const icon = document.getElementById('theme-icon');
+      const toggle = document.getElementById("theme-toggle");
       const html = document.documentElement;
 
       // Restore preference
-      const saved = localStorage.getItem('theme');
-      if (saved === 'light') {
-        html.classList.remove('dark');
-        if (icon) icon.textContent = '🌙';
+      const saved = localStorage.getItem("theme");
+      if (saved === "light") {
+        html.classList.remove("dark");
+      } else {
+        html.classList.add("dark");
       }
 
-      toggle?.addEventListener('click', () => {
-        const isDark = html.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+      toggle?.addEventListener("click", () => {
+        const isDark = html.classList.toggle("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
       });
     </script>
   </body>

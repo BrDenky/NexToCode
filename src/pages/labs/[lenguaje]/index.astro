@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LabCard from '../../../components/LabCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const labs = await getCollection('labs');
+  const uniqueLangs = [...new Set(labs.map((lab) => lab.data.lenguaje))];
+  return uniqueLangs.map((lenguaje) => ({
+    params: { lenguaje },
+  }));
+}
+
+const { lenguaje } = Astro.params;
+
+const allLabs = await getCollection('labs');
+const filteredLabs = allLabs
+  .filter((lab) => lab.data.lenguaje === lenguaje)
+  .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+
+const langLabels: Record<string, string> = {
+  cpp: 'C++',
+  python: 'Python',
+  rust: 'Rust',
+  javascript: 'JavaScript',
+};
+
+const label = langLabels[lenguaje] ?? lenguaje;
+---
+
+<BaseLayout title={`Labs ${label}`} description={`Laboratorios prácticos de programación en ${label}.`}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <!-- Breadcrumb -->
+    <nav class="font-retro-class text-xl mb-8 flex flex-wrap items-center gap-1 select-none" style="color: var(--color-text-secondary);">
+      <a href="/" class="hover:text-accent transition-colors">[ Inicio ]</a>
+      <span class="px-1 text-xs font-arcade-class opacity-50">&gt;&gt;</span>
+      <a href="/labs" class="hover:text-accent transition-colors">[ Laboratorios ]</a>
+      <span class="px-1 text-xs font-arcade-class opacity-50">&gt;&gt;</span>
+      <span class="text-accent font-bold">[ {label} ]</span>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="mb-12 border-b-4 border-dashed border-black/30 dark:border-border/30 pb-8">
+      <h1 class="text-4xl sm:text-5xl font-retro-class font-bold mb-3 text-text-primary">
+        [ LANG_SPECS: {label.toUpperCase()} ]
+      </h1>
+      <p class="text-base font-mono" style="color: var(--color-text-secondary);">
+        {filteredLabs.length} laboratorio{filteredLabs.length !== 1 ? 's' : ''} cargado{filteredLabs.length !== 1 ? 's' : ''} en el sistema para {label}.
+      </p>
+    </header>
+
+    <!-- Labs Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredLabs.map((lab) => {
+        const slugPart = lab.id.split('/').pop() ?? lab.id;
+        return (
+          <LabCard
+            titulo={lab.data.titulo}
+            descripcion={lab.data.descripcion}
+            lenguaje={lab.data.lenguaje}
+            dificultad={lab.data.dificultad}
+            etiquetas={lab.data.etiquetas}
+            fecha={lab.data.fecha}
+            slug={`${lab.data.lenguaje}/${slugPart}`}
+          />
+        );
+      })}
+    </div>
+
+    <!-- Navigation footer button -->
+    <div class="mt-20 pt-8 border-t-4 border-dashed border-black/30 dark:border-border/30 flex justify-start">
+      <a
+        href="/labs"
+        class="btn-retro"
+      >
+        &lt;&lt; TODOS LOS LENGUAJES
+      </a>
+    </div>
+  </div>
+</BaseLayout>

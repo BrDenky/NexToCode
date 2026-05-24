@@ -1,128 +1,169 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import LabCard from '../components/LabCard.astro';
-import { getCollection } from 'astro:content';
 
-const allLabs = await getCollection('labs');
-const featuredLabs = allLabs
-  .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime())
-  .slice(0, 3);
+// Single dynamic language spec for Python
+const languages = [
+  { 
+    name: 'Python', 
+    color: '#ffd200', 
+    status: 'READY', 
+    desc: '¡El lenguaje preferido para crear juegos y dar vida a tus robots! Aprende de forma divertida dibujando y jugando.', 
+    difficulty: 'FÁCIL' 
+  }
+];
+
+const modes = [
+  {
+    title: 'Crear Personaje',
+    color: '#ff007f',
+    desc: '¡Crea y entrena a tu héroe de código! Completa 10 misiones para evolucionar tu avatar, ganar accesorios retro y desbloquear superpoderes digitales.',
+    specs: ['10 MISIONES', 'AVATAR EVOLUTIVO'],
+    status: 'EN DESARROLLO'
+  },
+  {
+    title: 'Alcanza la Meta',
+    color: '#00f0ff',
+    desc: '¡El gran viaje de la programación! Supera 50 niveles de lógica y puzzles de código en laberintos interactivos. ¡Domina las variables y llega a la meta!',
+    specs: ['50 NIVELES', 'PUNTUACIÓN MÁXIMA'],
+    status: 'EN DESARROLLO'
+  },
+  {
+    title: 'Dibújalo Todo',
+    color: '#39ff14',
+    desc: '¡El modo creativo interactivo! Dibuja libremente en la pantalla y mira cómo tus trazos se convierten en botones y cajas de texto reales para crear tus propios videojuegos al instante.',
+    specs: ['MODO CREATIVO'],
+    status: 'PRÓXIMAMENTE'
+  }
+];
 ---
 
-<BaseLayout title="Inicio" description="Blog de laboratorios de programación. C++, Python y más.">
+<BaseLayout title="Inicio" description="Plataforma interactiva de programación para niños de escuela.">
 
-  <!-- Hero Section -->
-  <section class="relative overflow-hidden py-28 px-6">
-    <!-- Decorative background blobs -->
-    <div class="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-      <div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, var(--color-accent), transparent 70%);"></div>
-      <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full opacity-15"
-        style="background: radial-gradient(circle, #00adb5, transparent 70%);"></div>
-    </div>
-
-    <div class="max-w-4xl mx-auto text-center">
-      <div class="inline-block px-4 py-2 rounded-full text-sm font-mono mb-6 border"
-        style="background-color: var(--color-accent-subtle); color: var(--color-accent); border-color: var(--color-accent);">
-        ⚡ Aprende · Experimenta · Domina
+  <!-- Hero / Arcade Screen Section -->
+  <section class="relative overflow-hidden border-4 border-black dark:border-border bg-surface my-8 p-8 sm:p-12 shadow-[8px_8px_0px_var(--color-shadow)]">
+    <!-- Retro wireframe grid background -->
+    <div class="absolute inset-0 -z-10 pointer-events-none opacity-[0.08] dark:opacity-[0.12]"
+      style="background-image: linear-gradient(var(--color-border) 2px, transparent 2px), linear-gradient(90deg, var(--color-border) 2px, transparent 2px); background-size: 24px 24px;"></div>
+    
+    <div class="max-w-3xl">
+      <!-- Animated badge -->
+      <div class="inline-block px-3 py-1 text-xs font-arcade-class mb-6 border-2 border-black dark:border-border bg-surface"
+        style="box-shadow: 2.5px 2.5px 0px var(--color-shadow);">
+        <span class="text-accent animate-pulse font-bold">DISEÑA</span> · JUEGA · <span class="text-accent animate-pulse font-bold">APRENDE</span>
       </div>
 
-      <h1 class="text-5xl sm:text-6xl font-extrabold mb-6 leading-tight tracking-tight" style="color: var(--color-text-primary);">
-        Bienvenido a
-        <span style="
-          background: linear-gradient(135deg, var(--color-accent), #00adb5);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        "> NexToCode</span>
+      <h1 class="text-4xl sm:text-6xl font-retro-class leading-none mb-6 tracking-wide text-text-primary">
+        BIENVENIDO A <span class="text-accent font-arcade-class text-2xl sm:text-4xl block sm:inline mt-2 sm:mt-0 tracking-tighter">NexToCode</span>
       </h1>
 
-      <p class="text-xl leading-relaxed max-w-2xl mx-auto mb-10" style="color: var(--color-text-secondary);">
-        Un blog de laboratorios prácticos de programación. Cada laboratorio incluye explicación teórica,
-        código real y un entorno interactivo para ejecutarlo directamente en el navegador.
+      <p class="text-base leading-relaxed max-w-2xl mb-8 font-mono" style="color: var(--color-text-secondary);">
+        Aprende a programar de la forma más divertida. Juega misiones emocionantes, sube de nivel, 
+        diseña tu avatar y crea interfaces interactivas dibujando en tiempo real.
       </p>
 
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="/labs"
-          class="px-8 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 hover:shadow-lg"
-          style="background: linear-gradient(135deg, var(--color-accent), #00adb5);">
-          Explorar laboratorios
+      <div class="flex flex-wrap gap-4">
+        <a href="/labs" class="btn-retro !bg-accent !text-white hover:!bg-accent-hover hover:border-black">
+          [ INICIAR PARTIDA ]
         </a>
-        <a href="/about"
-          class="px-8 py-3 rounded-xl font-semibold border transition-all hover:scale-105"
-          style="border-color: var(--color-border); color: var(--color-text-primary); background-color: var(--color-surface);">
-          Sobre mí
+        <a href="/about" class="btn-retro">
+          [ SOBRE NOSOTROS ]
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Stats Bar -->
-  <section class="border-y py-8 px-6" style="border-color: var(--color-border); background-color: var(--color-surface);">
-    <div class="max-w-4xl mx-auto grid grid-cols-3 gap-6 text-center">
-      <div>
-        <p class="text-3xl font-bold" style="color: var(--color-accent);">{allLabs.length}</p>
-        <p class="text-sm" style="color: var(--color-text-secondary);">Laboratorios</p>
-      </div>
-      <div>
-        <p class="text-3xl font-bold" style="color: var(--color-accent);">1</p>
-        <p class="text-sm" style="color: var(--color-text-secondary);">Lenguajes</p>
-      </div>
-      <div>
-        <p class="text-3xl font-bold" style="color: var(--color-accent);">∞</p>
-        <p class="text-sm" style="color: var(--color-text-secondary);">Por aprender</p>
-      </div>
+  <!-- Selector de Modo Section -->
+  <section class="py-8 mb-12">
+    <div class="mb-8">
+      <h2 class="text-3xl sm:text-4xl font-retro-class text-text-primary font-bold">[ SELECCIONAR MODO ]</h2>
+      <p class="text-xs sm:text-sm font-arcade-class mt-1 tracking-tighter" style="color: var(--color-text-secondary);">ELIGE TU MODO DE JUEGO PARA EMPEZAR</p>
     </div>
-  </section>
 
-  <!-- Featured Labs -->
-  {featuredLabs.length > 0 && (
-    <section class="max-w-6xl mx-auto px-6 py-20">
-      <div class="flex items-center justify-between mb-10">
-        <div>
-          <h2 class="text-3xl font-bold" style="color: var(--color-text-primary);">Últimos laboratorios</h2>
-          <p class="mt-1" style="color: var(--color-text-secondary);">Los más recientes del blog</p>
-        </div>
-        <a href="/labs" class="text-sm font-medium hover:underline" style="color: var(--color-accent);">
-          Ver todos →
-        </a>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {modes.map(({ title, color, desc, specs, status }) => (
+        <div 
+          class="card-retro p-6 border-4 bg-surface flex flex-col justify-between relative select-none"
+          style={`border-color: var(--color-text-primary); hover:border-color: ${color};`}
+        >
+          <!-- Status Tag -->
+          <span 
+            class="absolute top-3 right-3 text-[0.55rem] font-arcade-class px-1.5 py-0.5 border-2 bg-surface"
+            style={`color: ${color}; border-color: ${color}; box-shadow: 1.5px 1.5px 0px ${color};`}
+          >
+            {status}
+          </span>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {featuredLabs.map((lab) => (
-          <LabCard
-            titulo={lab.data.titulo}
-            descripcion={lab.data.descripcion}
-            lenguaje={lab.data.lenguaje}
-            dificultad={lab.data.dificultad}
-            etiquetas={lab.data.etiquetas}
-            fecha={lab.data.fecha}
-            slug={lab.id}
-          />
-        ))}
-      </div>
-    </section>
-  )}
+          <div class="mt-4">
+            <h3 class="text-2xl font-retro-class font-bold mb-3" style={`color: ${color};`}>
+              {title.toUpperCase()}
+            </h3>
+            
+            <!-- Tech specs/features -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              {specs.map(spec => (
+                <span class="px-2 py-0.5 text-[0.6rem] font-arcade-class border border-black/40 dark:border-border/40 bg-surface/50 text-text-secondary">
+                  {spec}
+                </span>
+              ))}
+            </div>
 
-  <!-- Languages Section -->
-  <section class="px-6 py-16" style="background-color: var(--color-surface);">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--color-text-primary);">Lenguajes disponibles</h2>
-      <p class="mb-10" style="color: var(--color-text-secondary);">Actualmente y lo que viene...</p>
-      <div class="flex flex-wrap justify-center gap-4">
-        {[
-          { name: 'C++', color: '#00ADB5', status: 'Disponible' },
-          { name: 'Python', color: '#3572A5', status: 'Próximamente' },
-          { name: 'Rust', color: '#DEA584', status: 'Próximamente' },
-        ].map(({ name, color, status }) => (
-          <div class="flex items-center gap-3 px-5 py-3 rounded-xl border"
-            style={`border-color: ${color}44; background-color: ${color}11;`}>
-            <span class="w-3 h-3 rounded-full" style={`background-color: ${color};`}></span>
-            <span class="font-semibold" style={`color: ${color};`}>{name}</span>
-            <span class="text-xs px-2 py-0.5 rounded-full" style={`background-color: ${color}22; color: ${color};`}>{status}</span>
+            <p class="text-xs font-mono leading-relaxed" style="color: var(--color-text-secondary);">
+              {desc}
+            </p>
           </div>
-        ))}
-      </div>
+
+          <div class="mt-8 pt-4 border-t border-dashed border-black/25 dark:border-border/25">
+            <span class="text-xs font-arcade-class block text-center text-text-secondary opacity-50 select-none py-1">
+              [ BLOQUEADO ]
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Lenguajes Disponibles (Character Select style) -->
+  <section class="border-4 border-double border-black dark:border-border p-8 bg-surface shadow-[6px_6px_0px_var(--color-shadow)] mb-16">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-retro-class font-bold text-text-primary">[ LENGUAJES DISPONIBLES ]</h2>
+      <p class="text-xs font-arcade-class mt-1 tracking-tighter" style="color: var(--color-text-secondary);">ELIGE LA CLASE DE TU AVENTURERO</p>
+    </div>
+    
+    <div class="max-w-md mx-auto">
+      {languages.map(({ name, color, status, desc, difficulty }) => (
+        <div 
+          class="border-4 border-black dark:border-border p-5 bg-surface relative select-none flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0px_var(--color-shadow)]"
+          style={`border-color: ${color}; box-shadow: 4px 4px 0px ${color};`}
+        >
+          <!-- Status tag top right -->
+          <span 
+            class="absolute top-2 right-2 text-[0.55rem] font-arcade-class px-1.5 py-0.5 border"
+            style={`
+              background-color: ${color}22;
+              color: ${color};
+              border-color: ${color};
+            `}
+          >
+            {status}
+          </span>
+          
+          <div class="mt-4">
+            <span class="text-4xl font-retro-class font-bold block" style={`color: ${color};`}>
+              {name}
+            </span>
+            <span class="text-[0.6rem] font-arcade-class text-text-secondary block mt-1">NIVEL: {difficulty}</span>
+            <p class="text-xs font-mono mt-4 leading-relaxed" style="color: var(--color-text-secondary);">
+              {desc}
+            </p>
+          </div>
+          
+          <div class="mt-6 pt-4 border-t border-dashed border-black/25 dark:border-border/25">
+            <a href={`/labs`} class="text-xs font-arcade-class block text-center text-accent hover:underline py-1">
+              [ SELECCIONAR HÉROE > ]
+            </a>
+          </div>
+        </div>
+      ))}
     </div>
   </section>
 

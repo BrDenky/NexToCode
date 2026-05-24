@@ -13,53 +13,59 @@ const sortedLabs = allLabs.sort((a, b) => b.data.fecha.getTime() - a.data.fecha.
 ---
 
 <BaseLayout title="Laboratorios" description="Todos los laboratorios de programación en NexToCode.">
-  <div class="max-w-6xl mx-auto px-6 py-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
 
     <!-- Page Header -->
-    <header class="mb-12">
-      <h1 class="text-4xl font-bold mb-3" style="color: var(--color-text-primary);">Laboratorios</h1>
-      <p class="text-lg" style="color: var(--color-text-secondary);">
-        {allLabs.length} laboratorio{allLabs.length !== 1 ? 's' : ''} disponible{allLabs.length !== 1 ? 's' : ''}.
-        Filtros interactivos para encontrar exactamente lo que buscas.
+    <header class="mb-12 border-b-4 border-dashed border-black/30 dark:border-border/30 pb-8">
+      <h1 class="text-4xl sm:text-5xl font-retro-class font-bold mb-3 text-text-primary">[ LABORATORIOS_SPECS ]</h1>
+      <p class="text-base font-mono" style="color: var(--color-text-secondary);">
+        {allLabs.length} laboratorio{allLabs.length !== 1 ? 's' : ''} cargado{allLabs.length !== 1 ? 's' : ''} en el sistema.
+        Filtra por lenguaje y dificultad para iniciar tu simulación.
       </p>
     </header>
 
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-3 mb-10" id="filter-container">
-      <button
-        class="filter-btn active px-4 py-2 rounded-full text-sm font-medium border transition-all"
-        data-filter="all"
-        style="background-color: var(--color-accent); color: white; border-color: var(--color-accent);"
-      >
-        Todos ({allLabs.length})
-      </button>
+    <!-- Retro Filters Panel -->
+    <div class="flex flex-wrap gap-4 items-center justify-between mb-10 bg-surface border-4 border-black dark:border-border p-6 shadow-[6px_6px_0px_var(--color-shadow)]" id="filter-container">
+      
+      <!-- Language Categories -->
+      <div class="flex flex-wrap gap-3">
+        <button
+          class="filter-btn active px-4 py-2 border-2 border-black dark:border-border font-arcade-class text-[0.65rem] cursor-pointer bg-surface text-text-primary transition-all active:translate-y-0.5 active:translate-x-0.5"
+          data-filter="all"
+          style="background-color: var(--color-accent); color: white; border-color: var(--color-accent); box-shadow: 2px 2px 0px var(--color-shadow);"
+        >
+          TODOS ({allLabs.length})
+        </button>
 
-      {languages.map((lang) => {
-        const count = allLabs.filter(l => l.data.lenguaje === lang).length;
-        const labels = { cpp: 'C++', python: 'Python', rust: 'Rust', javascript: 'JavaScript' } as const;
-        const labelText = labels[lang as keyof typeof labels] ?? lang;
-        return (
-          <button
-            class="filter-btn px-4 py-2 rounded-full text-sm font-medium border transition-all"
-            data-filter={lang}
-            style="background-color: var(--color-surface); color: var(--color-text-secondary); border-color: var(--color-border);"
-          >
-            {labelText} ({count})
-          </button>
-        );
-      })}
+        {languages.map((lang) => {
+          const count = allLabs.filter(l => l.data.lenguaje === lang).length;
+          const labels = { cpp: 'C++', python: 'Python', rust: 'Rust', javascript: 'JavaScript' } as const;
+          const labelText = labels[lang as keyof typeof labels] ?? lang;
+          return (
+            <button
+              class="filter-btn px-4 py-2 border-2 border-black dark:border-border font-arcade-class text-[0.65rem] cursor-pointer bg-surface text-text-primary transition-all active:translate-y-0.5 active:translate-x-0.5"
+              data-filter={lang}
+              style="box-shadow: 2px 2px 0px var(--color-shadow);"
+            >
+              {labelText.toUpperCase()} ({count})
+            </button>
+          );
+        })}
+      </div>
 
-
-      <!-- Difficulty filter -->
-      <div class="ml-auto flex items-center gap-2">
-        <label for="diff-filter" class="text-sm" style="color: var(--color-text-secondary);">Dificultad máx:</label>
-        <select id="diff-filter" class="text-sm px-3 py-2 rounded-lg border"
-          style="background-color: var(--color-surface); color: var(--color-text-primary); border-color: var(--color-border);">
-          <option value="5">★★★★★</option>
-          <option value="4">★★★★</option>
-          <option value="3">★★★</option>
-          <option value="2">★★</option>
-          <option value="1">★</option>
+      <!-- Difficulty Selector -->
+      <div class="flex items-center gap-3 font-retro-class text-xl">
+        <label for="diff-filter" style="color: var(--color-text-secondary);">DIF_MAX:</label>
+        <select 
+          id="diff-filter" 
+          class="text-sm font-mono px-3 py-1.5 border-2 border-black dark:border-border bg-surface text-text-primary focus:outline-none cursor-pointer"
+          style="box-shadow: 2px 2px 0px var(--color-shadow);"
+        >
+          <option value="5">★★★★★ (EXPERT)</option>
+          <option value="4">★★★★☆ (HARD)</option>
+          <option value="3">★★★☆☆ (NORMAL)</option>
+          <option value="2">★★☆☆☆ (MEDIUM)</option>
+          <option value="1">★☆☆☆☆ (EASY)</option>
         </select>
       </div>
     </div>
@@ -84,11 +90,21 @@ const sortedLabs = allLabs.sort((a, b) => b.data.fecha.getTime() - a.data.fecha.
       })}
     </div>
 
-    <!-- Empty state -->
-    <div id="empty-state" class="hidden text-center py-20">
-      <p class="text-4xl mb-4">🔍</p>
-      <p class="text-lg font-medium" style="color: var(--color-text-primary);">No se encontraron laboratorios</p>
-      <p class="text-sm mt-1" style="color: var(--color-text-secondary);">Prueba cambiando los filtros.</p>
+    <!-- Retro Empty State -->
+    <div id="empty-state" class="hidden text-center py-20 border-4 border-black dark:border-border bg-surface shadow-[6px_6px_0px_var(--color-shadow)]">
+      <!-- Pixel Magnifying Glass SVG -->
+      <svg width="48" height="48" viewBox="0 0 16 16" class="mx-auto text-accent mb-4" fill="currentColor">
+        <rect x="5" y="2" width="6" height="2" />
+        <rect x="3" y="4" width="2" height="6" />
+        <rect x="11" y="4" width="2" height="6" />
+        <rect x="5" y="10" width="6" height="2" />
+        <rect x="9" y="8" width="4" height="2" />
+        <rect x="11" y="10" width="2" height="2" />
+        <rect x="13" y="12" width="2" height="2" />
+        <rect x="15" y="14" width="2" height="2" />
+      </svg>
+      <p class="text-2xl font-retro-class font-bold text-text-primary">[ ERROR: NO_LABS_FOUND ]</p>
+      <p class="text-sm font-mono mt-2" style="color: var(--color-text-secondary);">Prueba cambiando la dificultad o el lenguaje de la simulación.</p>
     </div>
   </div>
 
@@ -117,10 +133,17 @@ const sortedLabs = allLabs.sort((a, b) => b.data.fecha.getTime() - a.data.fecha.
       btn.addEventListener('click', () => {
         currentLang = btn.dataset.filter ?? 'all';
 
+        // Reset other buttons
         filterBtns.forEach((b) => {
-          b.style.cssText = 'background-color: var(--color-surface); color: var(--color-text-secondary); border-color: var(--color-border);';
+          b.style.backgroundColor = 'var(--color-surface)';
+          b.style.color = 'var(--color-text-primary)';
+          b.style.borderColor = 'var(--color-text-primary)';
         });
-        btn.style.cssText = 'background-color: var(--color-accent); color: white; border-color: var(--color-accent);';
+        
+        // Highlight active button
+        btn.style.backgroundColor = 'var(--color-accent)';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'var(--color-accent)';
 
         applyFilters();
       });
